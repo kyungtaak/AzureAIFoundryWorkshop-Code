@@ -14,8 +14,9 @@
 ### 하네스 점검 수정
 
 - `requirements.txt`의 `openai==3.0.0` → **`openai==2.53.0`**. PyPI에 3.x 배포가 존재하지 않아(최신 2.53.0) 설치 자체가 실패하던 문제. 노트북이 쓰는 `responses` / `conversations(.items)` / `embeddings` / `chat` API 표면은 2.53.0에 모두 존재함을 확인.
-- 검증 하네스를 **`scripts/verify.py`** 로 분리. 기존 AGENTS.md의 bash heredoc은 Windows PowerShell에서 실행되지 않아 Windows·macOS·Linux 공통으로 동작하는 Python 스크립트로 대체. `--only notebooks|docs|imports` 로 부분 실행 가능. AGENTS.md의 하네스 섹션을 이 스크립트 호출로 갱신.
+- 검증 하네스를 **`.github/scripts/verify.py`** 로 분리. 기존 AGENTS.md의 bash heredoc은 Windows PowerShell에서 실행되지 않아 Windows·macOS·Linux 공통으로 동작하는 Python 스크립트로 대체. `--only notebooks|docs|imports` 로 부분 실행 가능. AGENTS.md의 하네스 섹션을 이 스크립트 호출로 갱신.
 - docs 검사 범위를 `README.md` + `CHANGELOG.md` → 리포지토리의 **모든 `.md`** 로 확대 (AGENTS.md·LICENSE 문서 포함).
+- 수강생이 볼 필요 없는 유지보수 도구는 `.github/` 아래로 모아 루트를 README·챕터 폴더 중심으로 유지. AGENTS.md는 [공식 규약](https://agents.md/)상 에이전트가 루트부터 상위 탐색으로 찾기 때문에 루트에 남긴다.
 
 ## 2026-08-12 — 표준화 + 최신화 (modernize-standardize 브랜치)
 
@@ -33,7 +34,7 @@
 | 브랜드/포털 | "Azure AI Foundry", Models + endpoints 메뉴 | **"Microsoft Foundry"**, 신규 포털 **Build > Models** | [포털 마이그레이션 문서](https://learn.microsoft.com/azure/foundry/how-to/navigate-from-classic) |
 | .env | ENDPOINT + API_KEY 중심 | PROJECT_ENDPOINT 중심 (키 제거) | 위 인증 변경에 따름 |
 
-### 표준화 (팀 워크샵 콘텐츠 규약 적용)
+### 리포지토리 구조 정비
 
 - 폴더·파일 kebab-case 영문 + 번호 접두어 (`1. 사전 준비/` → `01-setup/`)
 - 루트 README frontmatter(메타데이터) + 각 장 README 축약 frontmatter 추가

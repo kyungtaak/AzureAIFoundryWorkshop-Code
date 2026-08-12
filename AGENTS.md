@@ -3,11 +3,12 @@
 이 문서는 GitHub Copilot(및 다른 AI 에이전트)이 이 리포지토리를 점검·유지보수할 때의 기준 지시문이다.
 **모든 작업 전에 이 문서와 CHANGELOG.md를 먼저 읽는다.**
 
+> 수강생은 이 문서가 아니라 [README.md](README.md)부터 보면 된다. 여기서부터는 유지보수자용 내용이다.
+
 ## 리포지토리 성격
 
 - Microsoft Foundry 입문 핸즈온 워크샵 (한국어, 건강·피트니스 예제)
 - [Azure/ai-foundry-workshop](https://github.com/Azure/ai-foundry-workshop) 기반 한국어 워크샵의 포크를 현행화한 것
-- **팀 워크샵 콘텐츠 표준의 첫 파일럿 적용 리포** — 여기서 검증된 규약이 팀 표준 템플릿의 기반이 된다
 
 ## 수행된 표준화 작업 (2026-08-12, modernize-standardize 브랜치)
 
@@ -31,12 +32,12 @@
 
 ## 검증 하네스 (변경 후 반드시 실행)
 
-`scripts/verify.py` 하나로 3종 검사를 실행한다. Windows·macOS·Linux 동일하게 동작한다.
+`.github/scripts/verify.py` 하나로 3종 검사를 실행한다. Windows·macOS·Linux 동일하게 동작한다.
 
 ```bash
 pip install -r requirements.txt nbformat pyyaml
-python scripts/verify.py            # 전체
-python scripts/verify.py --only docs  # 일부만 (notebooks | docs | imports)
+python .github/scripts/verify.py            # 전체
+python .github/scripts/verify.py --only docs  # 일부만 (notebooks | docs | imports)
 ```
 
 검사 내용:
@@ -50,7 +51,6 @@ python scripts/verify.py --only docs  # 일부만 (notebooks | docs | imports)
 ## 남은 작업 (백로그)
 
 1. 신규 Foundry 포털 스크린샷 재캡처 (02·03장의 핵심 단계만 최소한으로, alt-text 필수)
-2. 팀 카탈로그(workshop-viewer-poc)의 `data/external.yml`에 entry 등록 (E2E 검증 완료 — 2026-08-12)
 
 ## E2E 실행 검증 (2026-08-12 완료)
 

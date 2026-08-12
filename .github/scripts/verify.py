@@ -2,7 +2,7 @@
 
 사용법:
     pip install -r requirements.txt nbformat pyyaml
-    python scripts/verify.py
+    python .github/scripts/verify.py
 
 Windows/macOS/Linux 동일하게 동작하며, 실패가 하나라도 있으면 exit code 1을 반환한다.
 """
@@ -15,7 +15,7 @@ import re
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 EXCLUDE_DIRS = {".venv", "venv", ".git", "node_modules", "__pycache__", ".ipynb_checkpoints"}
 
 OK = "[OK]"
