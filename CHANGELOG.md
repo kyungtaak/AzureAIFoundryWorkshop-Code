@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 2026-08-12 — E2E 실행 검증 + 하네스 점검 수정
+
+### E2E 실행 검증 (validated_on 기입)
+
+실제 Azure 구독의 Foundry 프로젝트(`gpt-5-mini`, `text-embedding-3-small`)와 Azure AI Search로 04·05장 노트북 4개를 `nbconvert --execute`로 끝까지 실행해 통과를 확인했다. 루트 README frontmatter에 `validated_on: 2026-08-12` 기입.
+
+- **임베딩 호출 경로 수정 (04장 02·03 노트북)** — `project.get_openai_client()`가 만드는 **프로젝트 범위** base_url `{endpoint}/openai/v1` 에는 `/embeddings` 라우트가 없어 **404**가 발생한다 (chat/responses/conversations는 정상). 임베딩은 **리소스 범위** `https://<resource>.services.ai.azure.com/openai/v1` 을 써야 한다. 두 노트북에 `embedding_client`(base_url 오버라이드)를 추가하고 임베딩 호출을 전부 여기로 옮김. 01장 노트북의 부정확한 주석도 함께 정정.
+- 05장 Agent 노트북(`create_version` + `PromptAgentDefinition` + conversations/responses)은 수정 없이 통과. `get_openai_client(agent_name=...)`가 `allow_preview=True` 없이도 azure-ai-projects 2.4.0에서 동작함을 확인.
+- 03장 인증 절차(`AIProjectClient` + `DefaultAzureCredential` + `deployments.list()`)도 실제 프로젝트에서 통과.
+- 04장 RAG는 azure-search-documents 12.0.0으로 인덱스 생성·문서 업로드·`VectorizedQuery` 벡터 검색까지 정상 동작 (11.x 대비 breaking change 미발견).
+
+### 하네스 점검 수정
+
+- `requirements.txt`의 `openai==3.0.0` → **`openai==2.53.0`**. PyPI에 3.x 배포가 존재하지 않아(최신 2.53.0) 설치 자체가 실패하던 문제. 노트북이 쓰는 `responses` / `conversations(.items)` / `embeddings` / `chat` API 표면은 2.53.0에 모두 존재함을 확인.
+- 검증 하네스를 **`scripts/verify.py`** 로 분리. 기존 AGENTS.md의 bash heredoc은 Windows PowerShell에서 실행되지 않아 Windows·macOS·Linux 공통으로 동작하는 Python 스크립트로 대체. `--only notebooks|docs|imports` 로 부분 실행 가능. AGENTS.md의 하네스 섹션을 이 스크립트 호출로 갱신.
+- docs 검사 범위를 `README.md` + `CHANGELOG.md` → 리포지토리의 **모든 `.md`** 로 확대 (AGENTS.md·LICENSE 문서 포함).
+
 ## 2026-08-12 — 표준화 + 최신화 (modernize-standardize 브랜치)
 
 ### 콘텐츠 최신화 (2025-07 작성분 → 2026-08 기준)
@@ -27,6 +44,8 @@
 - 구(클래식) 포털 스크린샷 제거 → 텍스트 절차로 대체 (신규 포털 스크린샷은 실행 검증 시 재캡처 권장)
 
 ### 미검증 항목 (validated_on 미기입 사유)
+
+> 이 시점의 상태이며, E2E 실행 검증은 같은 날 별도로 완료되었다 (위 "E2E 실행 검증" 항목 참고).
 
 - 실제 Azure 구독으로 E2E 실행 검증은 수행되지 않음. 코드·절차는 2026-08-12 기준 공식 문서와 SDK 2.4.0 API 표면 검사로 확인됨.
 - 첫 E2E 실행 후 루트 README frontmatter의 `validated_on`을 기입할 것.

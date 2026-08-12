@@ -12,7 +12,7 @@ execution: [codespaces, local]
 status: active
 source: "localized: Azure/ai-foundry-workshop"
 last_updated: 2026-08-12
-# validated_on: E2E 실행 검증 후 날짜를 기입하세요 (예: 2026-08-15)
+validated_on: 2026-08-12
 ---
 
 # Microsoft Foundry Workshop (Code)

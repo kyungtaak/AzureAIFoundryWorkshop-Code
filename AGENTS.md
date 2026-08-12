@@ -31,54 +31,38 @@
 
 ## 검증 하네스 (변경 후 반드시 실행)
 
+`scripts/verify.py` 하나로 3종 검사를 실행한다. Windows·macOS·Linux 동일하게 동작한다.
+
 ```bash
 pip install -r requirements.txt nbformat pyyaml
-
-# 1) 노트북 유효성 + 코드 문법
-python - <<'EOF'
-import nbformat, glob, ast, sys
-ok = True
-for f in glob.glob('**/*.ipynb', recursive=True):
-    nb = nbformat.read(f, as_version=4)
-    nbformat.validate(nb)
-    for c in nb.cells:
-        if c.cell_type == 'code' and c.get('outputs'):
-            ok = False; print(f"❌ {f}: 출력이 클리어되지 않은 셀 존재")
-        if c.cell_type == 'code':
-            try: ast.parse(c.source)
-            except SyntaxError as e: ok = False; print(f"❌ {f}: {e}")
-    print(f"✅ {f}")
-sys.exit(0 if ok else 1)
-EOF
-
-# 2) frontmatter 파싱 + 상대 링크 생존 확인
-python - <<'EOF'
-import re, os, glob, yaml, sys
-errors = []
-for f in glob.glob('**/README.md', recursive=True) + ['README.md', 'CHANGELOG.md']:
-    if not os.path.exists(f): continue
-    text = open(f, encoding='utf-8').read()
-    if text.startswith('---'):
-        try: yaml.safe_load(text.split('---')[1])
-        except Exception as e: errors.append(f"{f}: frontmatter 오류 {e}")
-    for m in re.finditer(r'\]\((?!http|#)([^)]+)\)', text):
-        t = os.path.normpath(os.path.join(os.path.dirname(f), m.group(1).split('#')[0]))
-        if t and not os.path.exists(t): errors.append(f"{f}: 깨진 링크 → {m.group(1)}")
-print("\n".join(errors) or "✅ frontmatter·링크 정상")
-sys.exit(1 if errors else 0)
-EOF
-
-# 3) 임포트 스모크 테스트 (API 호출 없음)
-python -c "import azure.ai.projects, openai, azure.identity, azure.search.documents; from azure.ai.projects.models import PromptAgentDefinition; print('✅ SDK imports OK')"
+python scripts/verify.py            # 전체
+python scripts/verify.py --only docs  # 일부만 (notebooks | docs | imports)
 ```
+
+검사 내용:
+
+1. **notebooks** — 모든 `.ipynb`의 nbformat 스키마 유효성, 코드 셀 문법(`ast.parse`), 출력(outputs) 클리어 여부
+2. **docs** — 모든 `.md`의 frontmatter YAML 파싱, 상대 링크 대상 파일 존재 여부
+3. **imports** — `azure-ai-projects` / `openai` / `azure-identity` / `azure-search-documents` 임포트와 `PromptAgentDefinition`, `openai` 클라이언트의 `chat`·`embeddings`·`responses`·`conversations` 속성 존재 확인 (실제 API 호출 없음)
+
+실패가 하나라도 있으면 exit code 1을 반환한다.
 
 ## 남은 작업 (백로그)
 
-1. **[1순위] E2E 실행 검증** — Azure 구독으로 01→05장 전체를 실제 실행. 오류 수정 후 루트 README frontmatter의 `validated_on` 기입. 코드는 SDK 2.4.0 API 표면 검사까지만 검증된 상태(실 리소스 미검증)이므로, 특히 다음을 주의 깊게 확인:
-   - `03-basic-rag.ipynb`의 azure-search-documents 12.0 동작 (11.x 대비 breaking change 가능)
-   - `01-agent-basics.ipynb`의 conversations items 나열 부분(응답 객체 구조가 SDK 버전에 따라 다를 수 있음)
-2. 신규 Foundry 포털 스크린샷 재캡처 (02·03장의 핵심 단계만 최소한으로, alt-text 필수)
-3. E2E 검증 통과 후 팀 카탈로그(workshop-viewer-poc)의 `data/external.yml`에 entry 등록
+1. 신규 Foundry 포털 스크린샷 재캡처 (02·03장의 핵심 단계만 최소한으로, alt-text 필수)
+2. 팀 카탈로그(workshop-viewer-poc)의 `data/external.yml`에 entry 등록 (E2E 검증 완료 — 2026-08-12)
+
+## E2E 실행 검증 (2026-08-12 완료)
+
+04·05장 노트북 4개를 실제 Azure 리소스로 끝까지 실행해 통과했다. 재실행 절차:
+
+1. `az login` 후 `.env` 구성 (`.env.example` 참고)
+2. `pip install nbconvert ipykernel` 및 커널 등록
+3. `python -m nbconvert --to notebook --execute --output-dir <임시폴더> <노트북>` — 출력을 임시 폴더로 보내 리포의 노트북은 클리어 상태로 유지한다
+
+검증 중 확인된 API 제약 (수정 시 되돌리지 말 것):
+
+- **임베딩은 리소스 범위 엔드포인트를 써야 한다.** `project.get_openai_client()`의 프로젝트 범위 base_url `{PROJECT_ENDPOINT}/openai/v1` 에는 `/embeddings` 라우트가 없어 404가 난다. 04장 02·03 노트북은 `base_url`을 `https://<resource>.services.ai.azure.com/openai/v1` 로 오버라이드한 `embedding_client`를 별도로 만들어 쓴다. chat·responses·conversations는 프로젝트 범위 그대로 동작한다.
 
 ## DO NOT
 
