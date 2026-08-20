@@ -114,6 +114,7 @@ def check_docs() -> list[str]:
     import yaml
 
     link_pattern = re.compile(r"\]\((?!https?:|mailto:|#)([^)]+)\)")
+    fence_pattern = re.compile(r"^```.*?^```", re.DOTALL | re.MULTILINE)
     errors: list[str] = []
     for path in _iter_files("**/*.md"):
         rel = _rel(path)
@@ -129,7 +130,9 @@ def check_docs() -> list[str]:
                 except yaml.YAMLError as exc:
                     errors.append(f"{rel}: frontmatter YAML 오류 — {exc}")
 
-        for match in link_pattern.finditer(text):
+        # 코드 펜스 안의 예시 링크는 실제 링크가 아니므로 검사에서 제외한다.
+        body = fence_pattern.sub("", text)
+        for match in link_pattern.finditer(body):
             target = match.group(1).split("#")[0].strip()
             if not target:
                 continue

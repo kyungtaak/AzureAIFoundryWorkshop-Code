@@ -11,7 +11,7 @@ language: ko
 execution: [codespaces, local]
 status: active
 source: "localized: Azure/ai-foundry-workshop"
-last_updated: 2026-08-12
+last_updated: 2026-08-20
 validated_on: 2026-08-12
 ---
 

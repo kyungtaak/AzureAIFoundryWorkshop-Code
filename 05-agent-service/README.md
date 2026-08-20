@@ -1,7 +1,7 @@
 ---
 title: 05. Foundry Agent Service 기초
 duration_minutes: 40
-last_updated: 2026-08-12
+last_updated: 2026-08-20
 ---
 
 # 05. Foundry Agent Service 기초
@@ -14,9 +14,9 @@ last_updated: 2026-08-12
 - **Conversations + Responses API**로 대화 관리 (구 Assistants 방식의 thread/run을 대체)
 - 에이전트 정리(삭제)
 
-| 노트북 | 내용 |
-|--------|------|
-| [01-agent-basics.ipynb](01-agent-basics.ipynb) | 에이전트 생성 → 대화 → 정리 전체 흐름 |
+| 노트북 | 내용 | 소요 시간 |
+|--------|------|-----------|
+| [01-agent-basics.ipynb](01-agent-basics.ipynb) | 에이전트 생성 → 대화 → 정리 전체 흐름 | 40분 |
 
 > **변경 참고**: 이전 버전 워크샵의 `create_agent` / `threads` / `runs` 패턴(Assistants API 기반)은 2026-08-26 서비스 종료(sunset)되어 최신 패턴으로 전면 교체되었습니다. 자세한 내용은 [CHANGELOG](../CHANGELOG.md)와 [공식 마이그레이션 문서](https://learn.microsoft.com/azure/foundry/agents/how-to/migrate)를 참고하세요.
 
@@ -33,3 +33,7 @@ last_updated: 2026-08-12
 
 - 노트북의 정리 셀이 에이전트를 삭제합니다. 남아 있다면 포털 **Build > Agents**에서 수동 삭제하세요.
 - 워크샵 전체를 마쳤다면 리소스 그룹을 삭제해 과금을 방지하세요.
+
+## 다음 단계
+
+워크샵의 마지막 장입니다. 전체 경로와 리소스 정리 안내는 → [워크샵 루트 README](../README.md)
