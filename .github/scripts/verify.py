@@ -68,6 +68,47 @@ def check_notebooks() -> list[str]:
     return errors
 
 
+def check_structure() -> list[str]:
+    """노트북 첫 셀 미션 목록과 마지막 셀 미션 완료 정리를 확인한다 (AGENTS.md 2.1)."""
+    import nbformat
+
+    errors: list[str] = []
+    found = False
+    for path in _iter_files("**/*.ipynb"):
+        found = True
+        rel = _rel(path)
+        try:
+            nb = nbformat.read(path, as_version=4)
+        except Exception as exc:
+            errors.append(f"{rel}: 노트북을 읽지 못함 — {exc}")
+            continue
+
+        if not nb.cells:
+            errors.append(f"{rel}: 셀이 없음")
+            continue
+
+        cell_errors: list[str] = []
+        first, last = nb.cells[0], nb.cells[-1]
+
+        if first.cell_type != "markdown":
+            cell_errors.append(f"{rel}: 첫 셀이 markdown이 아님 (현재 {first.cell_type})")
+        elif "🎯" not in first.source:
+            cell_errors.append(f"{rel}: 첫 셀에 '**🎯 미션**' 목록이 없음")
+
+        if last.cell_type != "markdown":
+            cell_errors.append(f"{rel}: 마지막 셀이 markdown이 아님 (현재 {last.cell_type})")
+        elif "✅ 미션 완료" not in last.source:
+            cell_errors.append(f"{rel}: 마지막 셀에 '## ✅ 미션 완료' 헤딩이 없음")
+
+        errors.extend(cell_errors)
+        if not cell_errors:
+            print(f"  {OK} {rel}")
+
+    if not found:
+        errors.append("검사할 .ipynb 파일을 찾지 못함")
+    return errors
+
+
 def check_docs() -> list[str]:
     """frontmatter YAML 파싱과 상대 링크 대상 존재 여부를 확인한다."""
     import yaml
@@ -124,6 +165,7 @@ def check_imports() -> list[str]:
 
 CHECKS = {
     "notebooks": ("노트북 유효성 + 코드 문법 + 출력 클리어", check_notebooks),
+    "structure": ("노트북 셀 구조 (미션 목록 + 미션 완료)", check_structure),
     "docs": ("frontmatter 파싱 + 상대 링크 생존", check_docs),
     "imports": ("SDK 임포트 스모크 테스트", check_imports),
 }
