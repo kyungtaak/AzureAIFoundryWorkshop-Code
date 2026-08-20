@@ -1,7 +1,7 @@
 ---
 title: 04. Chat Completion · Embeddings · RAG
 duration_minutes: 90
-last_updated: 2026-08-12
+last_updated: 2026-08-20
 ---
 
 # 04. Chat Completion · Embeddings · RAG
